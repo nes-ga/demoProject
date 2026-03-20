@@ -1,0 +1,118 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.springframework.boot",
+    "module": "spring-boot-autoconfigure",
+    "version": "3.5.12-SNAPSHOT",
+    "attributes": {
+      "org.gradle.status": "integration"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.14.4"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot",
+          "version": {
+            "requires": "3.5.12-SNAPSHOT"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-autoconfigure-3.5.12-SNAPSHOT.jar",
+          "url": "spring-boot-autoconfigure-3.5.12-SNAPSHOT.jar",
+          "size": 2086008,
+          "sha512": "730ea6a74342002d828518df39f339e3cb3423c85b9a7092bc3425020f0561cedf6e7b163fcee2e26bec3432461a1022393578b96bd94ace9debdf79b2bfbb3f",
+          "sha256": "33c84cc2705efc96ee49b7dab27641f8f1488fc8c1eb83938253ecb7b3534d89",
+          "sha1": "5342872cdd32dbc0ab49198f9d1f85a0ee2442a2",
+          "md5": "1b583803ccfb96a58d8b6cd7385d456e"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot",
+          "version": {
+            "requires": "3.5.12-SNAPSHOT"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "spring-boot-autoconfigure-3.5.12-SNAPSHOT.jar",
+          "url": "spring-boot-autoconfigure-3.5.12-SNAPSHOT.jar",
+          "size": 2086008,
+          "sha512": "730ea6a74342002d828518df39f339e3cb3423c85b9a7092bc3425020f0561cedf6e7b163fcee2e26bec3432461a1022393578b96bd94ace9debdf79b2bfbb3f",
+          "sha256": "33c84cc2705efc96ee49b7dab27641f8f1488fc8c1eb83938253ecb7b3534d89",
+          "sha1": "5342872cdd32dbc0ab49198f9d1f85a0ee2442a2",
+          "md5": "1b583803ccfb96a58d8b6cd7385d456e"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-autoconfigure-3.5.12-SNAPSHOT-javadoc.jar",
+          "url": "spring-boot-autoconfigure-3.5.12-SNAPSHOT-javadoc.jar",
+          "size": 3210162,
+          "sha512": "904e142fea336c3bc2aa7e5f30c9f20be47b130a61bbe47946d7ed762cf5f9a3ac7d75b33e813758a54b77aef815d4d803dc9f1e10e2334869c48a3a8fab10b6",
+          "sha256": "c48f117855fe5eccf7207ce11a6b5b97c7f713352de78a7846eec4d02008137a",
+          "sha1": "6101cc318fb09894668615a57f0808adae8e835f",
+          "md5": "8b367710130a086127580f8d3389582c"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "spring-boot-autoconfigure-3.5.12-SNAPSHOT-sources.jar",
+          "url": "spring-boot-autoconfigure-3.5.12-SNAPSHOT-sources.jar",
+          "size": 1191391,
+          "sha512": "f1b0060a1de404c0d71c40f3fa7fa82705475a0ce2dfd05a875deeb71902565ebbb629a1039adc85ad444b596d03c9d733319e07debd5ff069503ecb17875be4",
+          "sha256": "0e034fb2622d628336d1ce89fa948e5167d9705d3e5bf3f6335a7b85ba0e9324",
+          "sha1": "ee3fb2d3e0d407425146c663f055e92e8116437f",
+          "md5": "daf51a4aa752d7f8a28abcab6e0e076a"
+        }
+      ]
+    }
+  ]
+}
