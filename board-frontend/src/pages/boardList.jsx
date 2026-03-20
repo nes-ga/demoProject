@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getBoards } from "../api/boardApi";
+import { useAuth } from "../auth/useAuth";
+import AuthControls from "../components/AuthControls";
 
 export default function BoardList() {
     const [boards, setBoards] = useState([]);
@@ -14,6 +16,7 @@ export default function BoardList() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
 
     useEffect(() => {
         let ignore = false;
@@ -24,6 +27,7 @@ export default function BoardList() {
 
             try {
                 const data = await getBoards({ page, size, keyword, sort });
+
                 if (ignore) {
                     return;
                 }
@@ -65,15 +69,15 @@ export default function BoardList() {
         const startPage = Math.max(0, page - 2);
         const endPage = Math.min(totalPages, startPage + 5);
 
-        for (let i = startPage; i < endPage; i += 1) {
+        for (let index = startPage; index < endPage; index += 1) {
             pages.push(
                 <button
-                    key={i}
+                    key={index}
                     type="button"
-                    className={`page-button ${page === i ? "is-active" : ""}`}
-                    onClick={() => setPage(i)}
+                    className={`page-button ${page === index ? "is-active" : ""}`}
+                    onClick={() => setPage(index)}
                 >
-                    {i + 1}
+                    {index + 1}
                 </button>
             );
         }
@@ -89,12 +93,19 @@ export default function BoardList() {
                         <p className="eyebrow">Board</p>
                         <h1>게시글 목록</h1>
                         <p className="page-description">
-                            검색과 정렬로 원하는 글을 빠르게 찾을 수 있게 정리했습니다.
+                            검색과 정렬로 원하는 글을 빠르게 찾고, 로그인 상태도 바로 확인할 수 있게 정리했습니다.
                         </p>
                     </div>
-                    <button type="button" className="primary-button" onClick={() => navigate("/create")}>
-                        게시글 작성
-                    </button>
+                    <div className="header-actions">
+                        <AuthControls />
+                        <button
+                            type="button"
+                            className="primary-button"
+                            onClick={() => navigate(currentUser ? "/create" : "/login")}
+                        >
+                            게시글 작성
+                        </button>
+                    </div>
                 </div>
 
                 <div className="toolbar">
@@ -159,7 +170,7 @@ export default function BoardList() {
                                             {board.title}
                                         </Link>
                                         <p className="board-card-subtitle">
-                                            게시글 번호 #{board.id}
+                                            게시글 번호 #{board.id} · 작성자 {board.writer || "익명"}
                                         </p>
                                     </div>
                                     <div className="board-meta">

@@ -1,4 +1,8 @@
-const BASE_URL = "http://localhost:8080";
+import { httpRequest } from "./http";
+
+const JSON_HEADERS = {
+    "Content-Type": "application/json"
+};
 
 export const getBoards = async ({ page = 0, size = 10, keyword = "", sort = "id,DESC" } = {}) => {
     const params = new URLSearchParams({
@@ -11,27 +15,31 @@ export const getBoards = async ({ page = 0, size = 10, keyword = "", sort = "id,
         params.set("keyword", keyword.trim());
     }
 
-    const res = await fetch(`${BASE_URL}/boards?${params.toString()}`);
-    return res.json();
+    return httpRequest(`/boards?${params.toString()}`);
 };
 
 export const getBoardDetail = async (id) => {
-    const res = await fetch(`${BASE_URL}/boards/${id}`);
-    return res.json();
+    return httpRequest(`/boards/${id}`);
 };
 
 export const increaseBoardView = async (id) => {
-    await fetch(`${BASE_URL}/boards/${id}/view`, {
+    await httpRequest(`/boards/${id}/view`, {
         method: "PATCH"
     });
 };
 
-export const createComment = async (boardId, data) => {
-    await fetch(`${BASE_URL}/boards/${boardId}/comments`, {
+export const createBoard = async (data) => {
+    return httpRequest("/boards", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: JSON_HEADERS,
+        body: JSON.stringify(data)
+    });
+};
+
+export const createComment = async (boardId, data) => {
+    await httpRequest(`/boards/${boardId}/comments`, {
+        method: "POST",
+        headers: JSON_HEADERS,
         body: JSON.stringify(data)
     });
 };

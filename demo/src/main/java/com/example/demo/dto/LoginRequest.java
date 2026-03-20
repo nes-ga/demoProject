@@ -4,10 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class CommentCreateRequest {
+public class LoginRequest {
 
     @NotBlank
-    private String content;
+    private String username;
 
-    private Long parentId;
+    @NotBlank
+    private String password;
 }

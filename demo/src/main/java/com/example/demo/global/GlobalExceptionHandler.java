@@ -15,7 +15,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(Exception e) {
-
         ErrorResponse error = new ErrorResponse(
                 "NOT_FOUND",
                 e.getMessage(),
@@ -27,9 +26,21 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException e) {
+        ErrorResponse error = new ErrorResponse(
+                "UNAUTHORIZED",
+                e.getMessage(),
+                HttpStatus.UNAUTHORIZED.value()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception e) {
-
         ErrorResponse error = new ErrorResponse(
                 "INTERNAL_SERVER_ERROR",
                 "서버 오류가 발생했습니다.",
@@ -42,8 +53,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException e){
-
+    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException e) {
         String message = e.getBindingResult()
                 .getFieldError()
                 .getDefaultMessage();

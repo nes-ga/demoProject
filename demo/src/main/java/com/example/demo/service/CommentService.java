@@ -17,23 +17,21 @@ public class CommentService {
 
     private final CommentMapper commentMapper;
 
-    public List<CommentResponseDTO> findByBoardId(Long boardId){
-
+    public List<CommentResponseDTO> findByBoardId(Long boardId) {
         List<CommentResponseDTO> comments = commentMapper.findByBoardId(boardId);
         Map<Long, CommentResponseDTO> map = new HashMap<>();
         List<CommentResponseDTO> result = new ArrayList<>();
 
-        for(CommentResponseDTO comment : comments){
+        for (CommentResponseDTO comment : comments) {
             map.put(comment.getId(), comment);
         }
 
-        for(CommentResponseDTO comment : comments) {
-
-            if(comment.getParentId() == null){
+        for (CommentResponseDTO comment : comments) {
+            if (comment.getParentId() == null) {
                 result.add(comment);
-            }else{
+            } else {
                 CommentResponseDTO parent = map.get(comment.getParentId());
-                if(parent != null){
+                if (parent != null) {
                     parent.getChildren().add(comment);
                 }
             }
@@ -42,11 +40,12 @@ public class CommentService {
         return result;
     }
 
-    public void createComment(Long boardId, CommentCreateRequest request){
-        commentMapper.createComment(boardId,
+    public void createComment(Long boardId, CommentCreateRequest request, String writer) {
+        commentMapper.createComment(
+                boardId,
                 request.getParentId(),
                 request.getContent(),
-                request.getWriter());
+                writer
+        );
     }
-
 }
