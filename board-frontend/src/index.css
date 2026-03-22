@@ -291,9 +291,61 @@ h2 {
   line-height: 1.7;
 }
 
+.comment-content {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
 .comment-section {
   display: grid;
   gap: 16px;
+}
+
+.comment-actions,
+.reply-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.comment-action-button {
+  border: 0;
+  background: transparent;
+  color: #0284c7;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+}
+
+.comment-action-button:hover {
+  color: #0f766e;
+}
+
+.comment-action-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.danger-action {
+  color: #b91c1c;
+}
+
+.danger-action:hover {
+  color: #991b1b;
+}
+
+.reply-form {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.reply-text-area {
+  min-height: 96px;
 }
 
 .login-card {
@@ -334,5 +386,11 @@ h2 {
   .board-summary,
   .comment-card-header {
     justify-content: flex-start;
+  }
+
+  .comment-actions,
+  .reply-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

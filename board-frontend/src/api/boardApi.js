@@ -43,3 +43,17 @@ export const createComment = async (boardId, data) => {
         body: JSON.stringify(data)
     });
 };
+
+export const updateComment = async (boardId, commentId, data) => {
+    await httpRequest(`/boards/${boardId}/comments/${commentId}`, {
+        method: "PUT",
+        headers: JSON_HEADERS,
+        body: JSON.stringify(data)
+    });
+};
+
+export const deleteComment = async (boardId, commentId) => {
+    await httpRequest(`/boards/${boardId}/comments/${commentId}`, {
+        method: "DELETE"
+    });
+};

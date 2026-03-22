@@ -8,6 +8,7 @@ import com.example.demo.dto.BoardSummaryResponse;
 import com.example.demo.dto.BoardUpdateRequest;
 import com.example.demo.dto.CommentCreateRequest;
 import com.example.demo.dto.CommentResponseDTO;
+import com.example.demo.dto.CommentUpdateRequest;
 import com.example.demo.dto.PageResponseDTO;
 import com.example.demo.global.ApiResponse;
 import com.example.demo.global.SessionAuthUtils;
@@ -63,6 +64,25 @@ public class BoardController {
     public ResponseEntity<ApiResponse<BoardDetailResponse>> findById(@PathVariable Long id) {
         BoardDetailResponse response = boardService.findById(id);
         return ResponseEntity.ok(new ApiResponse<>(response));
+    }
+
+    @PutMapping("/{boardId}/comments/{commentId}")
+    public ResponseEntity<Void> updateComment(@PathVariable Long boardId,
+                                              @PathVariable Long commentId,
+                                              @RequestBody @Valid CommentUpdateRequest request,
+                                              HttpSession session) {
+        String username = SessionAuthUtils.getRequiredUser(session).getUsername();
+        commentService.updateComment(commentId, request, username);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{boardId}/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long boardId,
+                                              @PathVariable Long commentId,
+                                              HttpSession session) {
+        String username = SessionAuthUtils.getRequiredUser(session).getUsername();
+        commentService.deleteComment(commentId, username);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")

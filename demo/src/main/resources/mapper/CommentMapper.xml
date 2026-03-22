@@ -34,4 +34,38 @@
         ORDER BY created_at ASC
     </select>
 
+    <select id="findById" resultType="com.example.demo.dto.CommentResponseDTO">
+        SELECT
+            id,
+            board_id as boardId,
+            parent_id as parentId,
+            content,
+            writer,
+            created_at as createdAt
+        FROM comment
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </select>
+
+    <update id="updateComment">
+        UPDATE comment
+        SET content = #{content}
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <update id="deleteComment">
+        UPDATE comment
+        SET deleted_at = NOW()
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <select id="countActiveChildren" resultType="int">
+        SELECT COUNT(*)
+        FROM comment
+        WHERE parent_id = #{id}
+          AND deleted_at IS NULL
+    </select>
+
 </mapper>

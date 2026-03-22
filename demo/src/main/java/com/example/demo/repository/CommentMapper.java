@@ -13,8 +13,17 @@ public interface CommentMapper {
 
     List<CommentResponseDTO> findByBoardId(@Param("boardId") Long boardId);
 
+    CommentResponseDTO findById(@Param("id") Long id);
+
     void createComment(@Param("boardId") Long boardId,
                        @Param("parentId") Long parentId,
                        @Param("content") String content,
                        @Param("writer") String writer);
+
+    int updateComment(@Param("id") Long id,
+                      @Param("content") String content);
+
+    int deleteComment(@Param("id") Long id);
+
+    int countActiveChildren(@Param("id") Long id);
 }
