@@ -14,6 +14,7 @@ export default function LoginPage() {
     const location = useLocation();
 
     const redirectPath = location.state?.from || "/";
+    const signupSuccessMessage = location.state?.signupSuccessMessage || "";
 
     if (!authLoading && currentUser) {
         return <Navigate to="/" replace />;
@@ -28,7 +29,7 @@ export default function LoginPage() {
             await login(form);
             navigate(redirectPath, { replace: true });
         } catch (requestError) {
-            setError(requestError.message || "로그인에 실패했습니다.");
+            setError(requestError.message || "Login failed.");
         } finally {
             setSubmitting(false);
         }
@@ -40,34 +41,41 @@ export default function LoginPage() {
                 <div className="page-header">
                     <div>
                         <p className="eyebrow">Auth</p>
-                        <h1>로그인</h1>
+                        <h1>Login</h1>
                         <p className="page-description">
-                            로그인하면 글 작성과 댓글 작성처럼 변경이 필요한 작업을 계속할 수 있습니다.
+                            Sign in to create posts, write comments, and access protected actions.
                         </p>
                     </div>
                 </div>
 
+                {signupSuccessMessage ? (
+                    <div className="empty-state">{signupSuccessMessage}</div>
+                ) : null}
+
                 <form className="login-form" onSubmit={handleSubmit}>
                     <input
                         className="text-input"
-                        placeholder="아이디"
+                        placeholder="Username"
                         value={form.username}
                         onChange={(event) => setForm((current) => ({ ...current, username: event.target.value }))}
                     />
                     <input
                         className="text-input"
                         type="password"
-                        placeholder="비밀번호"
+                        placeholder="Password"
                         value={form.password}
                         onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
                     />
                     {error ? <div className="empty-state error-state">{error}</div> : null}
                     <button type="submit" className="primary-button" disabled={submitting}>
-                        {submitting ? "로그인 중..." : "로그인"}
+                        {submitting ? "Signing in..." : "Login"}
                     </button>
                 </form>
 
-                <Link className="back-link" to="/">목록으로 돌아가기</Link>
+                <div className="inline-actions">
+                    <Link className="back-link" to="/signup">Create account</Link>
+                    <Link className="back-link" to="/">Back to board</Link>
+                </div>
             </section>
         </div>
     );

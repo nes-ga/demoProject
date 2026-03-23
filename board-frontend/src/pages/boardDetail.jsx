@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
     createComment,
     deleteComment,
     getBoardDetail,
     increaseBoardView,
+    updateBoard,
     updateComment
 } from "../api/boardApi";
 import { useAuth } from "../auth/useAuth";
@@ -12,13 +13,20 @@ import AuthControls from "../components/AuthControls";
 
 export default function BoardDetail() {
     const { id } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { currentUser } = useAuth();
+
     const [board, setBoard] = useState(null);
     const [content, setContent] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [submitError, setSubmitError] = useState("");
-    const { currentUser } = useAuth();
-    const navigate = useNavigate();
+    const [boardEditOpen, setBoardEditOpen] = useState(false);
+    const [boardEditTitle, setBoardEditTitle] = useState("");
+    const [boardEditContent, setBoardEditContent] = useState("");
+    const [boardEditError, setBoardEditError] = useState("");
+    const [boardEditSubmitting, setBoardEditSubmitting] = useState(false);
 
     useEffect(() => {
         let ignore = false;
@@ -28,9 +36,18 @@ export default function BoardDetail() {
             setError("");
 
             try {
-                if (shouldIncreaseView(id)) {
-                    await increaseBoardView(id);
+                const shouldSkipInitialViewIncrease = location.state?.skipInitialViewIncrease === true;
+
+                if (shouldSkipInitialViewIncrease) {
+                    clearSkipInitialViewIncrease();
                     markViewLoaded(id);
+                } else if (beginViewIncrease(id)) {
+                    try {
+                        await increaseBoardView(id);
+                    } catch (requestError) {
+                        clearViewLoaded(id);
+                        throw requestError;
+                    }
                 }
 
                 const data = await getBoardDetail(id);
@@ -54,7 +71,7 @@ export default function BoardDetail() {
         return () => {
             ignore = true;
         };
-    }, [id]);
+    }, [id, location.state]);
 
     const refreshBoard = async () => {
         const data = await getBoardDetail(id);
@@ -63,6 +80,52 @@ export default function BoardDetail() {
 
     const moveToLogin = () => {
         navigate("/login", { state: { from: `/boards/${id}` } });
+    };
+
+    const canEditBoard = currentUser && (
+        currentUser.username === board?.writer || currentUser.role === "ADMIN"
+    );
+
+    const openBoardEdit = () => {
+        setBoardEditTitle(board?.title ?? "");
+        setBoardEditContent(board?.content ?? "");
+        setBoardEditError("");
+        setBoardEditOpen(true);
+    };
+
+    const closeBoardEdit = () => {
+        setBoardEditOpen(false);
+        setBoardEditError("");
+        setBoardEditTitle(board?.title ?? "");
+        setBoardEditContent(board?.content ?? "");
+    };
+
+    const handleBoardUpdate = async () => {
+        if (!boardEditTitle.trim()) {
+            setBoardEditError("제목을 입력해 주세요.");
+            return;
+        }
+
+        setBoardEditSubmitting(true);
+        setBoardEditError("");
+
+        try {
+            await updateBoard(id, {
+                title: boardEditTitle.trim(),
+                content: boardEditContent.trim()
+            });
+            await refreshBoard();
+            setBoardEditOpen(false);
+        } catch (requestError) {
+            if (requestError.status === 401) {
+                moveToLogin();
+                return;
+            }
+
+            setBoardEditError(requestError.message || "게시글을 수정하지 못했습니다.");
+        } finally {
+            setBoardEditSubmitting(false);
+        }
     };
 
     const handleCreate = async () => {
@@ -161,18 +224,65 @@ export default function BoardDetail() {
 
                 <div className="detail-header">
                     <p className="eyebrow">Post #{board.id}</p>
-                    <h1>{board.title}</h1>
+                    {boardEditOpen ? (
+                        <input
+                            className="text-input"
+                            value={boardEditTitle}
+                            onChange={(event) => setBoardEditTitle(event.target.value)}
+                        />
+                    ) : (
+                        <h1>{board.title}</h1>
+                    )}
                     <p className="board-card-subtitle">작성자 {board.writer || "익명"}</p>
                     <div className="detail-meta">
                         <span>작성자 {board.writer || "익명"}</span>
                         <span>조회 {board.viewCount ?? 0}</span>
                         <span>{formatDate(board.createdAt)}</span>
                     </div>
+                    {canEditBoard ? (
+                        <div className="inline-actions">
+                            {boardEditOpen ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        className="primary-button"
+                                        onClick={handleBoardUpdate}
+                                        disabled={boardEditSubmitting}
+                                    >
+                                        {boardEditSubmitting ? "수정 중..." : "수정 저장"}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="secondary-button"
+                                        onClick={closeBoardEdit}
+                                        disabled={boardEditSubmitting}
+                                    >
+                                        취소
+                                    </button>
+                                </>
+                            ) : (
+                                <button type="button" className="secondary-button" onClick={openBoardEdit}>
+                                    게시글 수정
+                                </button>
+                            )}
+                        </div>
+                    ) : null}
+                    {boardEditError ? <div className="empty-state error-state">{boardEditError}</div> : null}
                 </div>
 
-                <article className="detail-content">
-                    {board.content}
-                </article>
+                {boardEditOpen ? (
+                    <section className="comment-form">
+                        <textarea
+                            className="text-area"
+                            value={boardEditContent}
+                            onChange={(event) => setBoardEditContent(event.target.value)}
+                        />
+                    </section>
+                ) : (
+                    <article className="detail-content">
+                        {board.content}
+                    </article>
+                )}
 
                 <section className="comment-section">
                     <div className="section-header">
@@ -182,7 +292,6 @@ export default function BoardDetail() {
 
                     {board.comments?.length ? (
                         <CommentTree
-                            boardId={id}
                             comments={board.comments}
                             currentUser={currentUser}
                             onReplyCreate={handleReplyCreate}
@@ -201,7 +310,7 @@ export default function BoardDetail() {
                         <p className="page-description">작성자는 {currentUser.username}로 자동 입력됩니다.</p>
                         <textarea
                             className="text-area"
-                            placeholder="댓글 내용을 입력해 주세요."
+                            placeholder="댓글 내용을 입력해 주세요"
                             value={content}
                             onChange={(event) => setContent(event.target.value)}
                         />
@@ -214,11 +323,7 @@ export default function BoardDetail() {
                     <div className="empty-state">
                         댓글을 작성하려면 로그인해 주세요.
                         <div className="inline-actions">
-                            <button
-                                type="button"
-                                className="secondary-button"
-                                onClick={moveToLogin}
-                            >
+                            <button type="button" className="secondary-button" onClick={moveToLogin}>
                                 로그인하러 가기
                             </button>
                         </div>
@@ -280,7 +385,7 @@ function CommentItem({
     const [deleteError, setDeleteError] = useState("");
     const [deleteSubmitting, setDeleteSubmitting] = useState(false);
 
-    const isOwner = currentUser?.username === comment.writer;
+    const isOwner = currentUser?.username === comment.writer || currentUser?.role === "ADMIN";
 
     const handleReplySubmit = async () => {
         if (!currentUser) {
@@ -355,10 +460,7 @@ function CommentItem({
     };
 
     return (
-        <div
-            className="comment-card"
-            style={{ marginLeft: `${depth * 20}px` }}
-        >
+        <div className="comment-card" style={{ marginLeft: `${depth * 20}px` }}>
             <div className="comment-card-header">
                 <strong>{comment.writer || "익명"}</strong>
                 <span>{formatDate(comment.createdAt)}</span>
@@ -448,7 +550,7 @@ function CommentItem({
                 <div className="reply-form">
                     <textarea
                         className="text-area reply-text-area"
-                        placeholder={`${comment.writer || "익명"}님에게 답글을 남겨보세요.`}
+                        placeholder={`${comment.writer || "익명"}님에게 답글을 남겨보세요`}
                         value={replyContent}
                         onChange={(event) => setReplyContent(event.target.value)}
                     />
@@ -504,21 +606,33 @@ function formatDate(value) {
     }).format(new Date(value));
 }
 
-function shouldIncreaseView(id) {
+function beginViewIncrease(id) {
     const key = getViewStorageKey(id);
     const lastViewedAt = Number(sessionStorage.getItem(key));
 
-    if (!lastViewedAt) {
-        return true;
+    if (lastViewedAt && Date.now() - lastViewedAt <= 2000) {
+        return false;
     }
 
-    return Date.now() - lastViewedAt > 2000;
+    markViewLoaded(id);
+    return true;
 }
 
 function markViewLoaded(id) {
     sessionStorage.setItem(getViewStorageKey(id), String(Date.now()));
 }
 
+function clearViewLoaded(id) {
+    sessionStorage.removeItem(getViewStorageKey(id));
+}
+
 function getViewStorageKey(id) {
     return `board-viewed-${id}`;
+}
+
+function clearSkipInitialViewIncrease() {
+    window.history.replaceState(
+        { ...window.history.state, usr: null },
+        document.title
+    );
 }

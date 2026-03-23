@@ -1,11 +1,15 @@
 package com.example.demo.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class BoardDetailResponse {
 
     private Long id;
@@ -17,22 +21,22 @@ public class BoardDetailResponse {
 //    private LocalDateTime updatedAt;
 
     private List<CommentResponseDTO> comments;
+//
+//    public BoardDetailResponse(Long id, String title, String content, Long viewCount,
+//                               String writer, LocalDateTime createdAt) {
+//        this.id = id;
+//        this.title = title;
+//        this.content = content;
+//        this.viewCount = viewCount;
+//        this.writer = writer;
+//        this.createdAt = createdAt;
+////        this.updatedAt = updatedAt;
+////        this.comments = comments;
+//    }
 
-    public BoardDetailResponse(Long id, String title, String content, Long viewCount,
-                               String writer, LocalDateTime createdAt) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.viewCount = viewCount;
-        this.writer = writer;
-        this.createdAt = createdAt;
-//        this.updatedAt = updatedAt;
+//    public void setComments(List<CommentResponseDTO> comments){
 //        this.comments = comments;
-    }
-
-    public void setComments(List<CommentResponseDTO> comments){
-        this.comments = comments;
-    }
+//    }
 }
 
 /*

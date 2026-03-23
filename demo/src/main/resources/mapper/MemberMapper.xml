@@ -17,4 +17,69 @@
         LIMIT 1
     </select>
 
+    <select id="findById" resultType="com.example.demo.domain.Member">
+        SELECT
+            id,
+            username,
+            password_hash as passwordHash,
+            role,
+            created_at as createdAt
+        FROM member
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO member (
+            username,
+            password_hash,
+            role,
+            created_at
+        )
+        VALUES (
+            #{username},
+            #{passwordHash},
+            #{role},
+            NOW()
+        )
+    </insert>
+
+    <select id="searchUsers" resultType="com.example.demo.dto.AdminUserResponse">
+        SELECT
+            id,
+            username,
+            role,
+            created_at as createdAt
+        FROM member
+        <where>
+            <if test="keyword != null and keyword != ''">
+                username LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countUsers" resultType="long">
+        SELECT COUNT(*)
+        FROM member
+        <where>
+            <if test="keyword != null and keyword != ''">
+                username LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </select>
+
+    <update id="updateRole">
+        UPDATE member
+        SET role = #{role}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE member
+        SET password_hash = #{passwordHash}
+        WHERE id = #{id}
+    </update>
+
 </mapper>

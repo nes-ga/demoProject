@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpSession;
 public final class SessionAuthUtils {
 
     public static final String SESSION_USER_KEY = "LOGIN_USER";
+    public static final String ADMIN_ROLE = "ADMIN";
 
     private SessionAuthUtils() {
     }
@@ -17,7 +18,20 @@ public final class SessionAuthUtils {
             return user;
         }
 
-        throw new UnauthorizedException("로그인이 필요합니다.");
+        throw new UnauthorizedException("Login is required.");
+    }
+
+    public static SessionUser getRequiredAdmin(HttpSession session) {
+        SessionUser user = getRequiredUser(session);
+        if (!isAdmin(user)) {
+            throw new ForbiddenException("Admin access is required.");
+        }
+
+        return user;
+    }
+
+    public static boolean isAdmin(SessionUser user) {
+        return user != null && ADMIN_ROLE.equalsIgnoreCase(user.getRole());
     }
 
     public static AuthUserResponse toResponse(SessionUser user) {

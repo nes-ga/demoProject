@@ -18,7 +18,9 @@ export default function BoardCreate() {
 
         try {
             const created = await createBoard({ title, content });
-            navigate(`/boards/${created.id}`);
+            navigate(`/boards/${created.id}`, {
+                state: { skipInitialViewIncrease: true }
+            });
         } catch (requestError) {
             setError(requestError.message || "게시글을 작성하지 못했습니다.");
         } finally {

@@ -105,6 +105,17 @@ a {
   font-weight: 700;
 }
 
+.auth-badge-button {
+  border: 0;
+  cursor: pointer;
+}
+
+.settings-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: #0f766e;
@@ -358,6 +369,169 @@ h2 {
   gap: 14px;
 }
 
+.profile-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #fff;
+  padding: 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.profile-label {
+  display: block;
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.success-state {
+  color: #047857;
+  border-color: rgba(4, 120, 87, 0.25);
+  background: rgba(236, 253, 245, 0.95);
+}
+
+.admin-shell {
+  width: min(1280px, calc(100% - 32px));
+}
+
+.admin-page {
+  display: grid;
+  gap: 24px;
+}
+
+.admin-frame {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.admin-sidebar,
+.admin-panel,
+.admin-content {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-sidebar {
+  align-content: start;
+  padding: 18px;
+  border: 1px solid #dbe4ee;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(241, 245, 249, 0.92));
+}
+
+.admin-menu-button {
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: transparent;
+  color: #0f172a;
+  font-weight: 700;
+  text-align: left;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.admin-menu-button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.admin-menu-button.is-active {
+  border-color: #0f766e;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.1), rgba(15, 118, 110, 0.18));
+  color: #0f766e;
+}
+
+.admin-layout {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+}
+
+.admin-list-panel,
+.admin-detail-panel,
+.admin-detail-stack,
+.admin-board-list,
+.admin-user-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-board-row {
+  border: 1px solid #dbe4ee;
+  border-radius: 18px;
+  background: #fff;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.admin-board-row:hover {
+  transform: translateY(-1px);
+  border-color: #38bdf8;
+  box-shadow: 0 12px 24px rgba(14, 165, 233, 0.08);
+}
+
+.admin-board-row.is-selected {
+  border-color: #0f766e;
+  background: linear-gradient(180deg, rgba(240, 253, 250, 0.95), rgba(255, 255, 255, 0.96));
+}
+
+.danger-fill {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.admin-content-body {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  margin-top: 12px;
+}
+
+.admin-user-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.admin-user-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #fff;
+  padding: 20px;
+  display: grid;
+  gap: 14px;
+}
+
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.role-admin {
+  background: rgba(2, 132, 199, 0.12);
+  color: #0369a1;
+}
+
+.role-user {
+  background: rgba(148, 163, 184, 0.16);
+  color: #475569;
+}
+
 @media (max-width: 720px) {
   .page-shell {
     width: min(100%, calc(100% - 20px));
@@ -388,9 +562,22 @@ h2 {
     justify-content: flex-start;
   }
 
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
   .comment-actions,
   .reply-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .admin-shell {
+    width: min(100%, calc(100% - 20px));
+  }
+
+  .admin-frame,
+  .admin-layout {
+    grid-template-columns: 1fr;
   }
 }

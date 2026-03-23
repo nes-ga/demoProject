@@ -10,6 +10,7 @@ import com.example.demo.dto.CommentCreateRequest;
 import com.example.demo.dto.CommentResponseDTO;
 import com.example.demo.dto.CommentUpdateRequest;
 import com.example.demo.dto.PageResponseDTO;
+import com.example.demo.dto.SessionUser;
 import com.example.demo.global.ApiResponse;
 import com.example.demo.global.SessionAuthUtils;
 import com.example.demo.service.BoardService;
@@ -71,8 +72,8 @@ public class BoardController {
                                               @PathVariable Long commentId,
                                               @RequestBody @Valid CommentUpdateRequest request,
                                               HttpSession session) {
-        String username = SessionAuthUtils.getRequiredUser(session).getUsername();
-        commentService.updateComment(commentId, request, username);
+        SessionUser user = SessionAuthUtils.getRequiredUser(session);
+        commentService.updateComment(commentId, request, user);
         return ResponseEntity.ok().build();
     }
 
@@ -80,14 +81,17 @@ public class BoardController {
     public ResponseEntity<Void> deleteComment(@PathVariable Long boardId,
                                               @PathVariable Long commentId,
                                               HttpSession session) {
-        String username = SessionAuthUtils.getRequiredUser(session).getUsername();
-        commentService.deleteComment(commentId, username);
+        SessionUser user = SessionAuthUtils.getRequiredUser(session);
+        commentService.deleteComment(commentId, user);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody @Valid BoardUpdateRequest request) {
-        boardService.update(id, request);
+    public ResponseEntity<Void> update(@PathVariable Long id,
+                                       @RequestBody @Valid BoardUpdateRequest request,
+                                       HttpSession session) {
+        SessionUser user = SessionAuthUtils.getRequiredUser(session);
+        boardService.update(id, request, user);
         return ResponseEntity.ok().build();
     }
 
@@ -98,8 +102,9 @@ public class BoardController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boardService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, HttpSession session) {
+        SessionUser user = SessionAuthUtils.getRequiredUser(session);
+        boardService.delete(id, user);
         return ResponseEntity.noContent().build();
     }
 

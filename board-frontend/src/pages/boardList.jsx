@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getBoards } from "../api/boardApi";
-import { useAuth } from "../auth/useAuth";
 import AuthControls from "../components/AuthControls";
 
 export default function BoardList() {
@@ -16,7 +15,6 @@ export default function BoardList() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    const { currentUser } = useAuth();
 
     useEffect(() => {
         let ignore = false;
@@ -101,7 +99,7 @@ export default function BoardList() {
                         <button
                             type="button"
                             className="primary-button"
-                            onClick={() => navigate(currentUser ? "/create" : "/login")}
+                            onClick={() => navigate("/create")}
                         >
                             게시글 작성
                         </button>

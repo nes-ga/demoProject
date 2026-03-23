@@ -14,6 +14,14 @@ export const login = async (credentials) => {
     return response.data;
 };
 
+export const signup = async (payload) => {
+    await httpRequest("/auth/signup", {
+        method: "POST",
+        headers: JSON_HEADERS,
+        body: JSON.stringify(payload)
+    });
+};
+
 export const logout = async () => {
     await httpRequest("/auth/logout", {
         method: "POST"
@@ -23,4 +31,12 @@ export const logout = async () => {
 export const getSessionUser = async () => {
     const response = await httpRequest("/auth/me");
     return response.data;
+};
+
+export const updatePassword = async (payload) => {
+    await httpRequest("/auth/password", {
+        method: "PATCH",
+        headers: JSON_HEADERS,
+        body: JSON.stringify(payload)
+    });
 };

@@ -17,7 +17,7 @@
     </select>
 
     <select id="findById" resultType="com.example.demo.dto.BoardDetailResponse">
-        SELECT id, title, content, writer, view_count as viewCount, created_at AS createdAt
+        SELECT id, title, content, view_count as viewCount, writer, created_at AS createdAt
         FROM board
         WHERE id = #{id}
           AND deleted_at IS NULL

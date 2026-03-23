@@ -9,6 +9,9 @@ import com.example.demo.dto.BoardSummaryResponse;
 import com.example.demo.dto.BoardUpdateRequest;
 import com.example.demo.dto.CommentResponseDTO;
 import com.example.demo.dto.PageResponseDTO;
+import com.example.demo.dto.SessionUser;
+import com.example.demo.global.ForbiddenException;
+import com.example.demo.global.SessionAuthUtils;
 import com.example.demo.repository.BoardMapper;
 import com.example.demo.repository.CommentMapper;
 import lombok.RequiredArgsConstructor;
@@ -96,16 +99,21 @@ public class BoardService {
         return "DESC";
     }
 
-    public void update(Long id, BoardUpdateRequest request) {
+    @Transactional
+    public void update(Long id, BoardUpdateRequest request, SessionUser user) {
+        BoardDetailResponse board = getRequiredBoard(id);
+        validateBoardAuthority(board, user);
         boardMapper.update(id, request.getTitle(), request.getContent());
     }
 
     @Transactional
-    public void delete(Long id) {
-        int result = boardMapper.delete(id);
+    public void delete(Long id, SessionUser user) {
+        BoardDetailResponse board = getRequiredBoard(id);
+        validateBoardAuthority(board, user);
 
+        int result = boardMapper.delete(id);
         if (result == 0) {
-            throw new IllegalArgumentException("게시글이 존재하지 않습니다.");
+            throw new IllegalArgumentException("Board not found.");
         }
     }
 
@@ -115,11 +123,7 @@ public class BoardService {
     }
 
     public BoardDetailResponse findById(Long id) {
-        BoardDetailResponse board = boardMapper.findById(id);
-
-        if (board == null) {
-            throw new IllegalArgumentException("게시글이 존재하지 않습니다.");
-        }
+        BoardDetailResponse board = getRequiredBoard(id);
 
         List<CommentResponseDTO> comments = commentMapper.findByBoardId(id);
 
@@ -142,5 +146,24 @@ public class BoardService {
 
         board.setComments(rootComments);
         return board;
+    }
+
+    private BoardDetailResponse getRequiredBoard(Long id) {
+        BoardDetailResponse board = boardMapper.findById(id);
+        if (board == null) {
+            throw new IllegalArgumentException("Board not found.");
+        }
+
+        return board;
+    }
+
+    private void validateBoardAuthority(BoardDetailResponse board, SessionUser user) {
+        if (SessionAuthUtils.isAdmin(user)) {
+            return;
+        }
+
+        if (!board.getWriter().equals(user.getUsername())) {
+            throw new ForbiddenException("Only the author or an admin can modify this board.");
+        }
     }
 }

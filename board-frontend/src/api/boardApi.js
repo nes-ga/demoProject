@@ -44,6 +44,14 @@ export const createComment = async (boardId, data) => {
     });
 };
 
+export const updateBoard = async (boardId, data) => {
+    await httpRequest(`/boards/${boardId}`, {
+        method: "PUT",
+        headers: JSON_HEADERS,
+        body: JSON.stringify(data)
+    });
+};
+
 export const updateComment = async (boardId, commentId, data) => {
     await httpRequest(`/boards/${boardId}/comments/${commentId}`, {
         method: "PUT",

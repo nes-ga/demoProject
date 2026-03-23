@@ -11,14 +11,14 @@ export default function AuthControls() {
     };
 
     if (authLoading) {
-        return <div className="auth-controls"><span className="auth-muted">세션 확인 중...</span></div>;
+        return <div className="auth-controls"><span className="auth-muted">Checking session...</span></div>;
     }
 
     if (!currentUser) {
         return (
             <div className="auth-controls">
                 <button type="button" className="secondary-button" onClick={() => navigate("/login")}>
-                    로그인
+                    Login
                 </button>
             </div>
         );
@@ -26,9 +26,16 @@ export default function AuthControls() {
 
     return (
         <div className="auth-controls">
-            <span className="auth-badge">{currentUser.username}</span>
+            <button type="button" className="auth-badge auth-badge-button" onClick={() => navigate("/mypage")}>
+                {currentUser.username}
+            </button>
+            {currentUser.role === "ADMIN" ? (
+                <button type="button" className="secondary-button" onClick={() => navigate("/admin")}>
+                    Admin
+                </button>
+            ) : null}
             <button type="button" className="secondary-button" onClick={handleLogout}>
-                로그아웃
+                Logout
             </button>
         </div>
     );

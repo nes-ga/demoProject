@@ -3,7 +3,9 @@ package com.example.demo.service;
 import com.example.demo.dto.CommentCreateRequest;
 import com.example.demo.dto.CommentResponseDTO;
 import com.example.demo.dto.CommentUpdateRequest;
+import com.example.demo.dto.SessionUser;
 import com.example.demo.global.ForbiddenException;
+import com.example.demo.global.SessionAuthUtils;
 import com.example.demo.repository.CommentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,43 +55,47 @@ public class CommentService {
     }
 
     @Transactional
-    public void updateComment(Long id, CommentUpdateRequest request, String writer) {
+    public void updateComment(Long id, CommentUpdateRequest request, SessionUser user) {
         CommentResponseDTO comment = getRequiredComment(id);
-        validateWriter(comment, writer);
+        validateCommentAuthority(comment, user);
 
         int updated = commentMapper.updateComment(id, request.getContent());
         if (updated == 0) {
-            throw new IllegalArgumentException("댓글이 존재하지 않습니다.");
+            throw new IllegalArgumentException("Comment not found.");
         }
     }
 
     @Transactional
-    public void deleteComment(Long id, String writer) {
+    public void deleteComment(Long id, SessionUser user) {
         CommentResponseDTO comment = getRequiredComment(id);
-        validateWriter(comment, writer);
+        validateCommentAuthority(comment, user);
 
         if (commentMapper.countActiveChildren(id) > 0) {
-            throw new IllegalStateException("답글이 있는 댓글은 삭제할 수 없습니다.");
+            throw new IllegalStateException("Comments with replies cannot be deleted.");
         }
 
         int deleted = commentMapper.deleteComment(id);
         if (deleted == 0) {
-            throw new IllegalArgumentException("댓글이 존재하지 않습니다.");
+            throw new IllegalArgumentException("Comment not found.");
         }
     }
 
     private CommentResponseDTO getRequiredComment(Long id) {
         CommentResponseDTO comment = commentMapper.findById(id);
         if (comment == null) {
-            throw new IllegalArgumentException("댓글이 존재하지 않습니다.");
+            throw new IllegalArgumentException("Comment not found.");
         }
 
         return comment;
     }
 
-    private void validateWriter(CommentResponseDTO comment, String writer) {
-        if (!comment.getWriter().equals(writer)) {
-            throw new ForbiddenException("본인이 작성한 댓글만 수정하거나 삭제할 수 있습니다.");
+    private void validateCommentAuthority(CommentResponseDTO comment, SessionUser user) {
+        if (SessionAuthUtils.isAdmin(user)) {
+            return;
+        }
+
+        if (!comment.getWriter().equals(user.getUsername())) {
+            throw new ForbiddenException("Only the author or an admin can modify this comment.");
         }
     }
 }
