@@ -13,7 +13,9 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const redirectPath = location.state?.from || "/";
+    const redirectPath = location.state?.from
+        || new URLSearchParams(location.search).get("redirect")
+        || "/";
     const signupSuccessMessage = location.state?.signupSuccessMessage || "";
 
     if (!authLoading && currentUser) {

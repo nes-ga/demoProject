@@ -1,4 +1,8 @@
 import { useEffect, useState } from "react";
+import {
+    SESSION_EXPIRED_EVENT,
+    redirectToLogin
+} from "../api/http";
 import { getSessionUser, login as loginRequest, logout as logoutRequest } from "../api/authApi";
 import { AuthContext } from "./AuthContextValue";
 
@@ -8,6 +12,20 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         refreshSession();
+    }, []);
+
+    useEffect(() => {
+        const handleSessionExpired = () => {
+            setCurrentUser(null);
+            setAuthLoading(false);
+            redirectToLogin();
+        };
+
+        window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+
+        return () => {
+            window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+        };
     }, []);
 
     const refreshSession = async () => {
