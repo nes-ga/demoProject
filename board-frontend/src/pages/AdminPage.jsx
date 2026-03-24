@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import {
     deleteAdminBoard,
     deleteAdminComment,
+    deleteAdminUser,
     getAdminBoardDetail,
     getAdminBoards,
     getAdminUsers,
+    getPinnedAdminUsers,
     updateAdminUserRole
 } from "../api/adminApi";
 import AuthControls from "../components/AuthControls";
@@ -35,6 +37,7 @@ export default function AdminPage() {
     const [boardActionMessage, setBoardActionMessage] = useState("");
 
     const [users, setUsers] = useState([]);
+    const [adminUsers, setAdminUsers] = useState([]);
     const [userPage, setUserPage] = useState(0);
     const [userSize, setUserSize] = useState(10);
     const [userKeywordInput, setUserKeywordInput] = useState("");
@@ -45,6 +48,7 @@ export default function AdminPage() {
     const [userError, setUserError] = useState("");
     const [userActionMessage, setUserActionMessage] = useState("");
     const [roleUpdatingId, setRoleUpdatingId] = useState(null);
+    const [userDeletingId, setUserDeletingId] = useState(null);
 
     useEffect(() => {
         let ignore = false;
@@ -141,16 +145,20 @@ export default function AdminPage() {
             setUserError("");
 
             try {
-                const data = await getAdminUsers({
-                    page: userPage,
-                    size: userSize,
-                    keyword: userKeyword
-                });
+                const [data, adminData] = await Promise.all([
+                    getAdminUsers({
+                        page: userPage,
+                        size: userSize,
+                        keyword: userKeyword
+                    }),
+                    getPinnedAdminUsers()
+                ]);
 
                 if (!ignore) {
                     setUsers(data.content ?? []);
                     setUserTotalPages(data.totalPages ?? 0);
                     setUserTotalElements(data.totalElements ?? 0);
+                    setAdminUsers(adminData.data ?? []);
                 }
             } catch (requestError) {
                 if (!ignore) {
@@ -190,15 +198,19 @@ export default function AdminPage() {
     };
 
     const refreshUsers = async () => {
-        const data = await getAdminUsers({
-            page: userPage,
-            size: userSize,
-            keyword: userKeyword
-        });
+        const [data, adminData] = await Promise.all([
+            getAdminUsers({
+                page: userPage,
+                size: userSize,
+                keyword: userKeyword
+            }),
+            getPinnedAdminUsers()
+        ]);
 
         setUsers(data.content ?? []);
         setUserTotalPages(data.totalPages ?? 0);
         setUserTotalElements(data.totalElements ?? 0);
+        setAdminUsers(adminData.data ?? []);
     };
 
     const reloadBoardsAfterDelete = async (deletedBoardId) => {
@@ -275,6 +287,26 @@ export default function AdminPage() {
             setUserError(requestError.message || "Failed to update the user role.");
         } finally {
             setRoleUpdatingId(null);
+        }
+    };
+
+    const handleDeleteUser = async (user) => {
+        const shouldDelete = window.confirm(`Delete user ${user.username}?`);
+        if (!shouldDelete) {
+            return;
+        }
+
+        setUserDeletingId(user.id);
+        setUserError("");
+
+        try {
+            await deleteAdminUser(user.id);
+            setUserActionMessage(`Deleted ${user.username}.`);
+            await refreshUsers();
+        } catch (requestError) {
+            setUserError(requestError.message || "Failed to delete the user.");
+        } finally {
+            setUserDeletingId(null);
         }
     };
 
@@ -515,6 +547,7 @@ export default function AdminPage() {
 
                                 <div className="board-summary">
                                     <span>Total users: {userTotalElements}</span>
+                                    <span>Admins pinned: {adminUsers.length}</span>
                                     {userActionMessage ? <span>{userActionMessage}</span> : null}
                                 </div>
 
@@ -522,37 +555,82 @@ export default function AdminPage() {
                                 {userError ? <div className="empty-state error-state">{userError}</div> : null}
 
                                 {!userLoading && !userError ? (
-                                    users.length ? (
-                                        <div className="admin-user-grid">
-                                            {users.map((user) => {
-                                                const nextRole = user.role === "ADMIN" ? "USER" : "ADMIN";
-                                                return (
-                                                    <article key={user.id} className="admin-user-card">
-                                                        <div className="comment-card-header">
-                                                            <strong>{user.username}</strong>
-                                                            <span>{formatDate(user.createdAt)}</span>
-                                                        </div>
-                                                        <div className="board-summary">
-                                                            <span>User #{user.id}</span>
-                                                            <span className={`role-chip role-${user.role?.toLowerCase()}`}>
-                                                                {user.role}
-                                                            </span>
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            className="secondary-button"
-                                                            onClick={() => handleUserRoleChange(user)}
-                                                            disabled={roleUpdatingId === user.id}
-                                                        >
-                                                            {roleUpdatingId === user.id ? "Updating..." : `Set ${nextRole}`}
-                                                        </button>
-                                                    </article>
-                                                );
-                                            })}
-                                        </div>
-                                    ) : (
-                                        <div className="empty-state">No users matched your search.</div>
-                                    )
+                                    <div className="admin-detail-stack">
+                                        <section className="comment-section">
+                                            <div className="section-header">
+                                                <h2>Pinned Admins</h2>
+                                                <span>{adminUsers.length} total</span>
+                                            </div>
+                                            {adminUsers.length ? (
+                                                <div className="admin-user-list">
+                                                    {adminUsers.map((user) => (
+                                                        <article key={user.id} className="admin-user-row">
+                                                            <div className="admin-user-main">
+                                                                <strong>{user.username}</strong>
+                                                                <p className="board-card-subtitle">
+                                                                    Admin #{user.id} and joined {formatDate(user.createdAt)}
+                                                                </p>
+                                                            </div>
+                                                            <div className="admin-user-meta">
+                                                                <span className={`role-chip role-${user.role?.toLowerCase()}`}>
+                                                                    {user.role}
+                                                                </span>
+                                                            </div>
+                                                        </article>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="empty-state">No admin accounts found.</div>
+                                            )}
+                                        </section>
+
+                                        <section className="comment-section">
+                                            <div className="section-header">
+                                                <h2>User List</h2>
+                                                <span>{users.length} rows</span>
+                                            </div>
+                                            {users.length ? (
+                                                <div className="admin-user-list">
+                                                    {users.map((user) => {
+                                                        const nextRole = user.role === "ADMIN" ? "USER" : "ADMIN";
+                                                        return (
+                                                            <article key={user.id} className="admin-user-row">
+                                                                <div className="admin-user-main">
+                                                                    <strong>{user.username}</strong>
+                                                                    <p className="board-card-subtitle">
+                                                                        User #{user.id} and joined {formatDate(user.createdAt)}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="admin-user-meta">
+                                                                    <span className={`role-chip role-${user.role?.toLowerCase()}`}>
+                                                                        {user.role}
+                                                                    </span>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="secondary-button"
+                                                                        onClick={() => handleUserRoleChange(user)}
+                                                                        disabled={roleUpdatingId === user.id || userDeletingId === user.id}
+                                                                    >
+                                                                        {roleUpdatingId === user.id ? "Updating..." : `Set ${nextRole}`}
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="secondary-button danger-fill"
+                                                                        onClick={() => handleDeleteUser(user)}
+                                                                        disabled={roleUpdatingId === user.id || userDeletingId === user.id}
+                                                                    >
+                                                                        {userDeletingId === user.id ? "Deleting..." : "Delete"}
+                                                                    </button>
+                                                                </div>
+                                                            </article>
+                                                        );
+                                                    })}
+                                                </div>
+                                            ) : (
+                                                <div className="empty-state">No users matched your search.</div>
+                                            )}
+                                        </section>
+                                    </div>
                                 ) : null}
 
                                 <div className="pagination">

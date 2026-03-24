@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.Member;
+import com.example.demo.dto.AdminUserDeleteResponse;
 import com.example.demo.dto.AdminUserResponse;
 import com.example.demo.dto.PageResponseDTO;
 import com.example.demo.dto.SessionUser;
@@ -54,6 +55,10 @@ public class MemberService {
         return new PageResponseDTO<>(page, size, total, users);
     }
 
+    public List<AdminUserResponse> findAdminUsers() {
+        return memberMapper.findAdminUsers();
+    }
+
     @Transactional
     public void updateRole(Long id, String role, SessionUser admin) {
         String normalizedRole = role == null ? "" : role.trim().toUpperCase();
@@ -70,5 +75,29 @@ public class MemberService {
         if (updated == 0) {
             throw new IllegalArgumentException("User not found.");
         }
+    }
+
+    @Transactional
+    public AdminUserDeleteResponse deleteUser(Long id, SessionUser admin) {
+        if (admin.getId().equals(id)) {
+            throw new ForbiddenException("You cannot delete your own account.");
+        }
+
+        Member member = memberMapper.findById(id);
+        if (member == null) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        int deleted = memberMapper.deleteById(id);
+        if (deleted == 0) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        AdminUserDeleteResponse response = memberMapper.findDeleteResponseById(id);
+        if (response == null) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        return response;
     }
 }

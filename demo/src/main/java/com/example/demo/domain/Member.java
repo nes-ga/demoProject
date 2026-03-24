@@ -11,4 +11,5 @@ public class Member {
     private String passwordHash;
     private String role;
     private LocalDateTime createdAt;
+    private LocalDateTime deletedAt;
 }

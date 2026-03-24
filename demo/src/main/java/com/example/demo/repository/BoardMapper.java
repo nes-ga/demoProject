@@ -1,9 +1,7 @@
 package com.example.demo.repository;
 
 import com.example.demo.domain.Board;
-import com.example.demo.dto.BoardCreateResponse;
 import com.example.demo.dto.BoardDetailResponse;
-import com.example.demo.dto.BoardResponseDTO;
 import com.example.demo.dto.BoardSummaryResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,10 +14,6 @@ public interface BoardMapper {
     void insert(Board board);
 
     List<Board> findAll();
-
-//    Board findById(Long id);
-
-//    BoardResponseDTO findById(Long id);
 
     BoardDetailResponse findById(Long id);
 

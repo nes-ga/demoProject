@@ -91,7 +91,7 @@ export default function BoardList() {
                         <p className="eyebrow">Board</p>
                         <h1>게시글 목록</h1>
                         <p className="page-description">
-                            검색과 정렬로 원하는 글을 빠르게 찾고, 로그인 상태도 바로 확인할 수 있게 정리했습니다.
+                            검색과 정렬로 원하는 글을 빠르게 찾고, 로그인 상태를 바로 확인할 수 있게 정리했습니다.
                         </p>
                     </div>
                     <div className="header-actions">
@@ -131,7 +131,7 @@ export default function BoardList() {
                         >
                             <option value="id,DESC">최신순</option>
                             <option value="viewCount,DESC">조회수 높은 순</option>
-                            <option value="title,ASC">제목 오름차순</option>
+                            <option value="title,ASC">제목 이름차순</option>
                             <option value="createdAt,ASC">오래된 순</option>
                         </select>
 

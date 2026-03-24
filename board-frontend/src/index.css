@@ -460,7 +460,7 @@ h2 {
 .admin-detail-panel,
 .admin-detail-stack,
 .admin-board-list,
-.admin-user-grid {
+.admin-user-list {
   display: grid;
   gap: 14px;
 }
@@ -499,17 +499,26 @@ h2 {
   margin-top: 12px;
 }
 
-.admin-user-grid {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.admin-user-card {
+.admin-user-row {
   border: 1px solid #e2e8f0;
   border-radius: 20px;
   background: #fff;
   padding: 20px;
-  display: grid;
-  gap: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-user-main {
+  min-width: 0;
+}
+
+.admin-user-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .role-chip {
@@ -579,5 +588,11 @@ h2 {
   .admin-frame,
   .admin-layout {
     grid-template-columns: 1fr;
+  }
+
+  .admin-user-row,
+  .admin-user-meta {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

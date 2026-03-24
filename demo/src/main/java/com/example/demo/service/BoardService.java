@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.domain.Board;
 import com.example.demo.dto.BoardCreateRequest;
 import com.example.demo.dto.BoardCreateResponse;
 import com.example.demo.dto.BoardDetailResponse;
@@ -32,7 +31,7 @@ public class BoardService {
 
     @Transactional
     public BoardCreateResponse create(BoardCreateRequest request, String writer) {
-        Board board = new Board();
+        com.example.demo.domain.Board board = new com.example.demo.domain.Board();
         board.setTitle(request.getTitle());
         board.setContent(request.getContent());
         board.setWriter(writer);
@@ -41,7 +40,7 @@ public class BoardService {
         return new BoardCreateResponse(board.getId(), board.getTitle(), board.getContent());
     }
 
-    public List<Board> findAll() {
+    public List<com.example.demo.domain.Board> findAll() {
         return boardMapper.findAll();
     }
 

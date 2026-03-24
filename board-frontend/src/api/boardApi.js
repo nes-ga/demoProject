@@ -52,6 +52,12 @@ export const updateBoard = async (boardId, data) => {
     });
 };
 
+export const deleteBoard = async (boardId) => {
+    await httpRequest(`/boards/${boardId}`, {
+        method: "DELETE"
+    });
+};
+
 export const updateComment = async (boardId, commentId, data) => {
     await httpRequest(`/boards/${boardId}/comments/${commentId}`, {
         method: "PUT",

@@ -27,7 +27,7 @@ export default function AuthControls() {
     return (
         <div className="auth-controls">
             <button type="button" className="auth-badge auth-badge-button" onClick={() => navigate("/mypage")}>
-                {currentUser.username}
+                myPage
             </button>
             {currentUser.role === "ADMIN" ? (
                 <button type="button" className="secondary-button" onClick={() => navigate("/admin")}>

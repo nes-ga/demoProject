@@ -36,7 +36,7 @@ export default function BoardCreate() {
                         <p className="eyebrow">Write</p>
                         <h1>게시글 작성</h1>
                         <p className="page-description">
-                            작성자는 세션 사용자로 자동 저장됩니다. 현재 작성자: {currentUser?.username}
+                            작성자는 현재 로그인한 사용자로 자동 입력됩니다. 현재 작성자: {currentUser?.username}
                         </p>
                     </div>
                     <AuthControls />
@@ -61,7 +61,7 @@ export default function BoardCreate() {
 
                     <div className="inline-actions">
                         <button type="button" className="primary-button" onClick={handleSubmit} disabled={submitting}>
-                            {submitting ? "작성 중..." : "작성"}
+                            {submitting ? "작성 중.." : "작성"}
                         </button>
                         <Link className="back-link" to="/">취소</Link>
                     </div>

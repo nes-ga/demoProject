@@ -11,9 +11,11 @@
             username,
             password_hash as passwordHash,
             role,
-            created_at as createdAt
+            created_at as createdAt,
+            deleted_at as deletedAt
         FROM member
         WHERE username = #{username}
+          AND deleted_at IS NULL
         LIMIT 1
     </select>
 
@@ -23,9 +25,11 @@
             username,
             password_hash as passwordHash,
             role,
-            created_at as createdAt
+            created_at as createdAt,
+            deleted_at as deletedAt
         FROM member
         WHERE id = #{id}
+          AND deleted_at IS NULL
         LIMIT 1
     </select>
 
@@ -52,20 +56,36 @@
             created_at as createdAt
         FROM member
         <where>
+            deleted_at IS NULL
+            AND role = 'USER'
             <if test="keyword != null and keyword != ''">
-                username LIKE CONCAT('%', #{keyword}, '%')
+                AND username LIKE CONCAT('%', #{keyword}, '%')
             </if>
         </where>
         ORDER BY created_at DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
+    <select id="findAdminUsers" resultType="com.example.demo.dto.AdminUserResponse">
+        SELECT
+            id,
+            username,
+            role,
+            created_at as createdAt
+        FROM member
+        WHERE deleted_at IS NULL
+          AND role = 'ADMIN'
+        ORDER BY created_at ASC
+    </select>
+
     <select id="countUsers" resultType="long">
         SELECT COUNT(*)
         FROM member
         <where>
+            deleted_at IS NULL
+            AND role = 'USER'
             <if test="keyword != null and keyword != ''">
-                username LIKE CONCAT('%', #{keyword}, '%')
+                AND username LIKE CONCAT('%', #{keyword}, '%')
             </if>
         </where>
     </select>
@@ -74,12 +94,30 @@
         UPDATE member
         SET role = #{role}
         WHERE id = #{id}
+          AND deleted_at IS NULL
     </update>
 
     <update id="updatePassword">
         UPDATE member
         SET password_hash = #{passwordHash}
         WHERE id = #{id}
+          AND deleted_at IS NULL
     </update>
+
+    <update id="deleteById">
+        UPDATE member
+        SET deleted_at = NOW()
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <select id="findDeleteResponseById" resultType="com.example.demo.dto.AdminUserDeleteResponse">
+        SELECT
+            id,
+            username,
+            deleted_at as deletedAt
+        FROM member
+        WHERE id = #{id}
+    </select>
 
 </mapper>

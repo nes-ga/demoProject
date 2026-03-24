@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.AdminUserDeleteResponse;
 import com.example.demo.dto.AdminUserResponse;
 import com.example.demo.dto.AdminUserRoleUpdateRequest;
 import com.example.demo.dto.BoardDetailResponse;
@@ -72,6 +73,12 @@ public class AdminController {
         return ResponseEntity.ok(memberService.findUsers(resolvedPage, resolvedSize, keyword));
     }
 
+    @GetMapping("/users/admins")
+    public ResponseEntity<ApiResponse<java.util.List<AdminUserResponse>>> getAdminUsers(HttpSession session) {
+        SessionAuthUtils.getRequiredAdmin(session);
+        return ResponseEntity.ok(new ApiResponse<>(memberService.findAdminUsers()));
+    }
+
     @PatchMapping("/users/{id}/role")
     public ResponseEntity<Void> updateUserRole(@PathVariable Long id,
                                                @RequestBody @Valid AdminUserRoleUpdateRequest request,
@@ -79,5 +86,12 @@ public class AdminController {
         SessionUser admin = SessionAuthUtils.getRequiredAdmin(session);
         memberService.updateRole(id, request.getRole(), admin);
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<ApiResponse<AdminUserDeleteResponse>> deleteUser(@PathVariable Long id, HttpSession session) {
+        SessionUser admin = SessionAuthUtils.getRequiredAdmin(session);
+        AdminUserDeleteResponse response = memberService.deleteUser(id, admin);
+        return ResponseEntity.ok(new ApiResponse<>(response));
     }
 }

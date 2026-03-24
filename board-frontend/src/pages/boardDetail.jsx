@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
     createComment,
+    deleteBoard,
     deleteComment,
     getBoardDetail,
     increaseBoardView,
@@ -149,6 +150,25 @@ export default function BoardDetail() {
         }
     };
 
+    const handleBoardDelete = async () => {
+        const shouldDelete = window.confirm("이 게시글을 삭제할까요?");
+        if (!shouldDelete) {
+            return;
+        }
+
+        try {
+            await deleteBoard(id);
+            navigate("/");
+        } catch (requestError) {
+            if (requestError.status === 401) {
+                moveToLogin();
+                return;
+            }
+
+            setBoardEditError(requestError.message || "게시글을 삭제하지 못했습니다.");
+        }
+    };
+
     const handleReplyCreate = async (parentId, replyContent) => {
         try {
             await createComment(id, { content: replyContent, parentId });
@@ -233,9 +253,8 @@ export default function BoardDetail() {
                     ) : (
                         <h1>{board.title}</h1>
                     )}
-                    <p className="board-card-subtitle">작성자 {board.writer || "익명"}</p>
                     <div className="detail-meta">
-                        <span>작성자 {board.writer || "익명"}</span>
+                        <span>Writer {board.writer || "Anonymous"}</span>
                         <span>조회 {board.viewCount ?? 0}</span>
                         <span>{formatDate(board.createdAt)}</span>
                     </div>
@@ -249,7 +268,7 @@ export default function BoardDetail() {
                                         onClick={handleBoardUpdate}
                                         disabled={boardEditSubmitting}
                                     >
-                                        {boardEditSubmitting ? "수정 중..." : "수정 저장"}
+                                        {boardEditSubmitting ? "수정 중.." : "수정 저장"}
                                     </button>
                                     <button
                                         type="button"
@@ -261,9 +280,18 @@ export default function BoardDetail() {
                                     </button>
                                 </>
                             ) : (
-                                <button type="button" className="secondary-button" onClick={openBoardEdit}>
-                                    게시글 수정
-                                </button>
+                                <>
+                                    <button type="button" className="secondary-button" onClick={openBoardEdit}>
+                                        게시글 수정
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="secondary-button danger-fill"
+                                        onClick={handleBoardDelete}
+                                    >
+                                        삭제
+                                    </button>
+                                </>
                             )}
                         </div>
                     ) : null}
@@ -310,7 +338,7 @@ export default function BoardDetail() {
                         <p className="page-description">작성자는 {currentUser.username}로 자동 입력됩니다.</p>
                         <textarea
                             className="text-area"
-                            placeholder="댓글 내용을 입력해 주세요"
+                            placeholder="댓글 내용을 입력해 주세요."
                             value={content}
                             onChange={(event) => setContent(event.target.value)}
                         />
@@ -481,7 +509,7 @@ function CommentItem({
                             onClick={handleEditSubmit}
                             disabled={editSubmitting}
                         >
-                            {editSubmitting ? "수정 중..." : "수정 저장"}
+                            {editSubmitting ? "수정 중.." : "수정 저장"}
                         </button>
                         <button
                             type="button"
@@ -515,7 +543,7 @@ function CommentItem({
                         setReplyOpen((prev) => !prev);
                     }}
                 >
-                    {replyOpen ? "답글 닫기" : "답글 달기"}
+                    {replyOpen ? "답글 닫기" : "답글 쓰기"}
                 </button>
 
                 {isOwner ? (
@@ -538,7 +566,7 @@ function CommentItem({
                             onClick={handleDelete}
                             disabled={deleteSubmitting}
                         >
-                            {deleteSubmitting ? "삭제 중..." : "삭제"}
+                            {deleteSubmitting ? "삭제 중.." : "삭제"}
                         </button>
                     </>
                 ) : null}
@@ -562,7 +590,7 @@ function CommentItem({
                             onClick={handleReplySubmit}
                             disabled={replySubmitting}
                         >
-                            {replySubmitting ? "등록 중..." : "답글 등록"}
+                            {replySubmitting ? "등록 중.." : "답글 등록"}
                         </button>
                         <button
                             type="button"

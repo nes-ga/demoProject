@@ -43,6 +43,10 @@ export const getAdminUsers = async ({ page = 0, size = 10, keyword = "" } = {}) 
     return httpRequest(`/admin/users?${params.toString()}`);
 };
 
+export const getPinnedAdminUsers = async () => {
+    return httpRequest("/admin/users/admins");
+};
+
 export const updateAdminUserRole = async (id, role) => {
     await httpRequest(`/admin/users/${id}/role`, {
         method: "PATCH",
@@ -50,5 +54,11 @@ export const updateAdminUserRole = async (id, role) => {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({ role })
+    });
+};
+
+export const deleteAdminUser = async (id) => {
+    await httpRequest(`/admin/users/${id}`, {
+        method: "DELETE"
     });
 };

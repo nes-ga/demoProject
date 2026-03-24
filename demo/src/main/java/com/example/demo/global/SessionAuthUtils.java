@@ -12,9 +12,22 @@ public final class SessionAuthUtils {
     private SessionAuthUtils() {
     }
 
-    public static SessionUser getRequiredUser(HttpSession session) {
+    public static SessionUser getOptionalUser(HttpSession session) {
+        if (session == null) {
+            return null;
+        }
+
         Object sessionUser = session.getAttribute(SESSION_USER_KEY);
         if (sessionUser instanceof SessionUser user) {
+            return user;
+        }
+
+        return null;
+    }
+
+    public static SessionUser getRequiredUser(HttpSession session) {
+        SessionUser user = getOptionalUser(session);
+        if (user != null) {
             return user;
         }
 

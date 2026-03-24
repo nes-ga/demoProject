@@ -1,6 +1,7 @@
 package com.example.demo.repository;
 
 import com.example.demo.domain.Member;
+import com.example.demo.dto.AdminUserDeleteResponse;
 import com.example.demo.dto.AdminUserResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -17,8 +18,12 @@ public interface MemberMapper {
                                         @Param("size") int size,
                                         @Param("keyword") String keyword);
 
+    List<AdminUserResponse> findAdminUsers();
+
     long countUsers(@Param("keyword") String keyword);
 
     int updateRole(@Param("id") Long id, @Param("role") String role);
     int updatePassword(@Param("id") Long id, @Param("passwordHash") String passwordHash);
+    int deleteById(@Param("id") Long id);
+    AdminUserDeleteResponse findDeleteResponseById(@Param("id") Long id);
 }
